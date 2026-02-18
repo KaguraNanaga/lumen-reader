@@ -1,0 +1,7 @@
+name = "lumen"
+pages_build_output_dir = "public"
+compatibility_date = "2025-01-01"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "c0b380e5782e4b54906bbba185f04f0a"

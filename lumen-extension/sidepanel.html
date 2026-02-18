@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="sidepanel.css">
+  <title>Lumen</title>
+</head>
+<body>
+  <div class="status-bar">
+    <span class="status-bar-brand logo">L</span>
+    <span class="status-bar-title page-title" id="pageTitle" data-i18n="waitingAnalysis"></span>
+  </div>
+
+  <div class="content" id="content">
+    <div class="idle-state" id="idleState">
+      <p data-i18n="idleHint"></p>
+    </div>
+
+    <div id="loadingState" style="display:none"></div>
+
+    <div class="error-box" id="errorState" style="display:none"></div>
+
+    <div id="resultState" style="display:none"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="toolbar-btn" id="btnReanalyze" data-i18n="reanalyzeBtn"></button>
+    <button class="toolbar-btn secondary" id="btnCopy" data-i18n="copyBtn"></button>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

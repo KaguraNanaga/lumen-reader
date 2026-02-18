@@ -1,0 +1,22 @@
+# Cloudflare
+.wrangler/
+.dev.vars
+
+# Dependencies
+node_modules/
+
+# Codex prompts (internal dev docs)
+codex-prompt-*.md
+
+# Dev drafts
+skeleton-responsive.html
+System.Drawing.Drawing2D.GraphicsPath
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
