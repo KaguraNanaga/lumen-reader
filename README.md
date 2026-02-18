@@ -1,8 +1,10 @@
 # Lumen — Argument Skeleton Analyzer
 
+**English** | [中文](./README_CN.md)
+
 Lumen extracts the argument skeleton from any article: core claim, reasoning chain, logic gaps, and reading advice. It's a Chrome extension + web app powered by Gemini, designed to help readers see *how* an author argues, not just *what* they argue.
 
-**[Try the Web App](https://lumen-atj-4t6.pages.dev)** · **[Install Chrome Extension](#chrome-extension)**
+**[Try the Web App](https://lumen-atj-4t6.pages.dev)** · **[Install Chrome Extension](#load-the-chrome-extension)**
 
 ## What It Does
 
@@ -89,7 +91,7 @@ User → Chrome Extension sidepanel / Web app (public/index.html)
 
 ```bash
 git clone https://github.com/KaguraNanaga/lumen-reader.git
-cd lumen
+cd lumen-reader
 ```
 
 Create a `.dev.vars` file for local development:
@@ -129,6 +131,8 @@ Set the `GEMINI_API_KEY` secret in Cloudflare dashboard → Pages → Settings �
 
 ### 4. Load the Chrome extension
 
+The extension is not yet on the Chrome Web Store. Load it in developer mode:
+
 1. Open `chrome://extensions/`
 2. Enable "Developer mode"
 3. Click "Load unpacked" → select the `lumen-extension/` folder
@@ -141,28 +145,29 @@ Set the `GEMINI_API_KEY` secret in Cloudflare dashboard → Pages → Settings �
 ```
 ├── functions/
 │   └── api/
-│       └── analyze.js        # API: prompt, rate limiting, validation
+│       └── analyze.js          # API: prompt, rate limiting, validation
 ├── lumen-extension/
-│   ├── _locales/              # i18n (en + zh_CN)
+│   ├── _locales/               # i18n (en + zh_CN)
 │   ├── icons/
-│   ├── background.js          # Extension lifecycle
-│   ├── content.js             # Article text extraction (Readability.js)
-│   ├── sidepanel.js           # Extension UI rendering
+│   ├── background.js           # Extension lifecycle
+│   ├── content.js              # Article text extraction (Readability.js)
+│   ├── sidepanel.js            # Extension UI rendering
 │   ├── sidepanel.css
 │   ├── sidepanel.html
-│   ├── Readability.js         # Mozilla Readability
+│   ├── Readability.js          # Mozilla Readability
 │   └── manifest.json
 ├── public/
-│   ├── index.html             # Web app (React, single file)
+│   ├── index.html              # Web app (React, single file)
 │   ├── privacy.html
 │   ├── terms.html
 │   └── icons/
-└── wrangler.toml
+├── wrangler.toml
+└── README_CN.md                # 中文说明
 ```
 
 ## JSON Schema (V3)
 
-The AI outputs structured JSON with phases, nodes, connectors, and gaps. See the full schema in the [handoff document](./HANDOFF.md) or in `analyze.js`.
+The AI outputs structured JSON with phases, nodes, connectors, and gaps. See the full schema in `analyze.js`.
 
 Key design decisions:
 - `spine[]` → `phases[].nodes[]` — long articles need collapsible stage grouping
@@ -187,18 +192,14 @@ The most valuable part of this project is the prompt in `analyze.js`. If you wan
 
 ## Bilingual Support
 
-Both the web app and extension support English and Chinese with a manual toggle button. The AI automatically outputs analysis in the same language as the input article.
+Both the web app and extension support English and Chinese. The web app has a manual toggle button (CN/EN). The AI automatically outputs analysis in the same language as the input article.
 
 ## License
 
 MIT
 
----
+## Acknowledgments
 
-## 中文说明
-
-Lumen 是一个论证结构分析工具。粘贴文章后，AI 提取论证骨架：核心主张、推理链条、逻辑缺口、阅读建议。
-
-项目的核心价值在于 prompt 工程——如何让 AI 产出真正有用的论证分析，而不是泛泛的摘要。关键设计包括：删除测试（上位原则）、六种论证结构识别、论证密度≠篇幅、禁止评价词列表等。
-
-详细的项目交接文档见 [HANDOFF.md](./HANDOFF.md)。
+- [Mozilla Readability](https://github.com/mozilla/readability) — Article text extraction
+- [Google Gemini](https://deepmind.google/technologies/gemini/) — AI analysis engine
+- [Cloudflare Pages](https://pages.cloudflare.com/) — Deployment and edge computing
