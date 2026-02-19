@@ -4,7 +4,7 @@
 
 Lumen extracts the argument skeleton from any article: core claim, reasoning chain, logic gaps, and reading advice. It's a Chrome extension + web app powered by Gemini, designed to help readers see *how* an author argues, not just *what* they argue.
 
-**[Try the Web App](https://lumen-atj-4t6.pages.dev)** · **[Install Chrome Extension](#load-the-chrome-extension)**
+**[Try the Web App](https://lumen-reader.uk)** · **[Install Chrome Extension](#load-the-chrome-extension)**
 
 ## What It Does
 
