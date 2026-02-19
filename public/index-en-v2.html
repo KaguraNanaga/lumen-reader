@@ -1,0 +1,1426 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumen</title>
+  <link rel="icon" type="image/png" sizes="48x48" href="/icons/icon48.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="/icons/icon128.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1714;
+      --ink-secondary: #5c5549;
+      --ink-muted: #9b9183;
+      --paper: #faf8f4;
+      --paper-warm: #f4f0e8;
+      --paper-card: #ffffff;
+      --border: #e8e2d8;
+      --border-light: #f0ece4;
+      --accent-blue: #3b6b9a;
+      --accent-amber: #b8860b;
+      --accent-red: #c44536;
+      --accent-green: #4a7c59;
+      --accent-slate: #64748b;
+      --shadow-soft: 0 2px 16px -4px rgba(40, 32, 20, 0.08);
+      --shadow-card: 0 1px 4px rgba(40, 32, 20, 0.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    @media (min-width: 780px) { .container { max-width: 960px; } }
+    @media (min-width: 1100px) { .container { max-width: 1060px; } }
+    .header { padding: 64px 0 40px; border-bottom: 1px solid var(--border); }
+    .header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .header-actions { display: flex; gap: 10px; align-items: center; margin-top: 8px; flex-shrink: 0; }
+    .header-brand { font-family: 'Noto Serif SC', serif; font-size: 32px; letter-spacing: 0.15em; color: var(--ink); text-transform: uppercase; margin-bottom: 8px; font-weight: 700; }
+    .header-title { font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 600; color: var(--ink-secondary); line-height: 1.3; }
+    .header-sub { font-size: 14px; color: var(--ink-muted); margin-top: 10px; max-width: 520px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: none; font-family: 'Noto Sans SC', sans-serif; }
+    .btn-primary { background: var(--ink); color: var(--paper); }
+    .btn-primary:hover { background: #2a2520; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-ghost { background: transparent; color: var(--ink-secondary); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--ink-muted); color: var(--ink); }
+    .input-section { padding: 32px 0; }
+    .textarea { width: 100%; min-height: 160px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; font-family: 'Noto Sans SC', sans-serif; font-size: 14px; line-height: 1.8; color: var(--ink); background: var(--paper-card); resize: vertical; outline: none; transition: border-color 0.15s; }
+    .textarea:focus { border-color: var(--ink-muted); }
+    .textarea::placeholder { color: var(--ink-muted); }
+    .input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; flex-wrap: wrap; gap: 12px; }
+    .result-section { padding: 0 0 80px; }
+    .claim-banner { background: var(--ink); color: var(--paper); padding: 32px; border-radius: 10px; margin-bottom: 32px; }
+    .claim-label { font-size: 11px; letter-spacing: 0.25em; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 12px; }
+    .claim-text { font-family: 'Noto Serif SC', serif; font-size: 20px; font-weight: 600; line-height: 1.5; }
+    .claim-metrics { display: flex; gap: 24px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .metric { display: flex; flex-direction: column; gap: 4px; }
+    .metric-label { font-size: 11px; letter-spacing: 0.15em; color: rgba(255,255,255,0.4); }
+    .metric-value { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.9); }
+    .metric-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .dot-green { background: #4ade80; }
+    .dot-yellow { background: #fbbf24; }
+    .dot-red { background: #f87171; }
+    .spine { position: relative; padding-left: 28px; }
+    .spine::before { content: ''; position: absolute; left: 5px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+    .step { position: relative; margin-bottom: 8px; }
+    .step-dot { position: absolute; left: -28px; top: 20px; width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--paper); z-index: 1; }
+    .dot-origin { background: var(--accent-blue); }
+    .dot-setup { background: var(--accent-slate); }
+    .dot-reasoning { background: var(--accent-amber); }
+    .dot-turning { background: var(--accent-red); }
+    .dot-conclusion { background: var(--ink); }
+    .step-card { background: var(--paper-card); border: 1px solid var(--border-light); border-radius: 8px; padding: 20px 24px; cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-card); }
+    .step-card:hover { border-color: var(--border); box-shadow: var(--shadow-soft); }
+    .step-card.turning { border-left: 3px solid var(--accent-red); }
+    .step-card.selected { background: var(--paper-warm); border-color: var(--border); }
+    .step.level-2 { margin-left: 20px; }
+    .step.level-2 .step-dot { width: 7px; height: 7px; top: 16px; left: -24px; opacity: 0.5; }
+    .step.level-2 .step-card { background: var(--paper); border: 1px solid var(--border-light); box-shadow: none; padding: 14px 20px; }
+    .step.level-2 .step-card:hover { background: var(--paper-warm); box-shadow: none; }
+    .step.level-2 .step-title { font-family: 'Noto Sans SC', sans-serif; font-size: 14px; font-weight: 600; }
+    .step.level-2 .step-summary { font-size: 13px; }
+    .step.level-2 .step-detail { font-size: 13px; }
+    .step.level-2 .connector-text { font-size: 12px; }
+    .step-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .step-title { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.4; }
+    .step-tag { flex-shrink: 0; font-size: 11px; font-weight: 500; padding: 2px 10px; border-radius: 4px; letter-spacing: 0.05em; }
+    .tag-origin { background: #e8f0f8; color: var(--accent-blue); }
+    .tag-setup { background: #f0eff4; color: var(--accent-slate); }
+    .tag-reasoning { background: #fef3e0; color: var(--accent-amber); }
+    .tag-turning { background: #fce8e6; color: var(--accent-red); }
+    .tag-conclusion { background: #f0ece4; color: var(--ink); }
+    .step-summary { font-size: 14px; color: var(--ink-secondary); margin-top: 8px; line-height: 1.7; }
+    .step-detail { font-size: 14px; color: var(--ink); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light); line-height: 1.8; }
+    .step-toggle { font-size: 12px; color: var(--ink-muted); cursor: pointer; background: none; border: none; font-family: 'Noto Sans SC', sans-serif; padding: 0; }
+    .step-toggle:hover { color: var(--ink-secondary); }
+    .connector { padding: 6px 0; display: flex; align-items: center; }
+    .connector-text { font-size: 13px; color: var(--ink-muted); font-style: italic; line-height: 1.6; padding: 4px 0; }
+    .connector-text.turning-connector { color: var(--accent-red); }
+
+    /* Phase sections */
+    .phase-section { margin-bottom: 12px; }
+    .phase-header {
+      display: flex; align-items: center; gap: 12px; padding: 16px 20px;
+      background: var(--paper-card); border: 1px solid var(--border-light);
+      border-radius: 8px; transition: all 0.15s; user-select: none;
+    }
+    .phase-header:hover { border-color: var(--border); box-shadow: var(--shadow-card); }
+    .phase-section.open > .phase-header { border-radius: 8px 8px 0 0; border-bottom-color: transparent; }
+    .phase-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .phase-info { flex: 1; min-width: 0; }
+    .phase-title-text { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 700; color: var(--ink); }
+    .phase-subtitle-text { font-size: 13px; color: var(--ink-secondary); margin-top: 2px; }
+    .phase-arrow { font-size: 14px; color: var(--ink-muted); flex-shrink: 0; }
+    .phase-body-content {
+      background: var(--paper-card); border: 1px solid var(--border-light); border-top: none;
+      border-radius: 0 0 8px 8px; padding: 16px 20px; box-shadow: var(--shadow-card);
+    }
+
+    /* Dual-column layout */
+    .phase-body-inner { display: block; position: relative; }
+    .phase-map { padding: 0; }
+    .phase-detail-panel { display: none; }
+    .node-inline-detail { margin-top: 10px; }
+
+    @media (min-width: 780px) {
+      .phase-body-inner {
+        display: flex;
+        flex-direction: row;
+      }
+      .phase-map {
+        flex: 1 1 50%;
+        min-width: 200px;
+        max-height: 520px;
+        overflow-y: auto;
+        padding: 12px 16px;
+      }
+      .phase-resizer {
+        flex: 0 0 5px;
+        cursor: col-resize;
+        background: var(--border-light);
+        transition: background 0.15s;
+        position: relative;
+        z-index: 2;
+      }
+      .phase-resizer:hover,
+      .phase-resizer.dragging {
+        background: var(--accent-blue);
+      }
+      .phase-resizer::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 3px;
+        height: 32px;
+        border-left: 1px solid var(--ink-muted);
+        border-right: 1px solid var(--ink-muted);
+        opacity: 0.3;
+      }
+      .phase-resizer:hover::after { opacity: 0.6; }
+      .phase-detail-panel {
+        display: block;
+        flex: 1 1 50%;
+        min-width: 200px;
+        max-height: 520px;
+        overflow-y: auto;
+        padding: 20px 24px;
+      }
+      .node-inline-detail { display: none !important; }
+    }
+
+    /* Collapsible gap items */
+    .gap-item { cursor: pointer; }
+    .gap-item-toggle { font-size: 11px; color: var(--ink-muted); margin-left: auto; flex-shrink: 0; transition: transform 0.2s; }
+    .gap-item-toggle.open { transform: rotate(90deg); }
+    .gap-item-desc { display: none; }
+    .gap-item.open .gap-item-desc { display: block; }
+
+    /* Detail panel styles */
+    .detail-empty { color: var(--ink-muted); font-size: 13px; padding: 40px 0; text-align: center; }
+    .dp-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .dp-title { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 700; color: var(--ink); }
+    .dp-type { font-size: 11px; font-weight: 500; padding: 2px 10px; border-radius: 4px; }
+    .dpt-origin { background: #e8f0f8; color: var(--accent-blue); }
+    .dpt-setup { background: #f0eff4; color: var(--accent-slate); }
+    .dpt-reasoning { background: #fef3e0; color: var(--accent-amber); }
+    .dpt-turning { background: #fce8e6; color: var(--accent-red); }
+    .dpt-conclusion { background: #f0ece4; color: var(--ink); }
+    .dp-summary { font-size: 14px; color: var(--ink-secondary); line-height: 1.7; margin-bottom: 12px; }
+    .dp-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--ink-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .dp-body { font-size: 14px; color: var(--ink); line-height: 1.8; margin-bottom: 16px; }
+    .dp-transition { font-size: 13px; font-style: italic; color: var(--ink-muted); line-height: 1.6; padding: 10px 12px; background: var(--paper-warm); border-left: 3px solid var(--border); border-radius: 0 6px 6px 0; }
+
+    /* Connector variants */
+    .connector-fork { padding: 4px 0 4px 28px; }
+    .connector-fork-label {
+      font-size: 12px; font-weight: 600; color: var(--accent-amber);
+      padding: 2px 10px; background: rgba(184, 134, 11, 0.08);
+      border: 1px solid rgba(184, 134, 11, 0.2); border-radius: 4px;
+    }
+    .connector-merge { padding: 4px 0 4px 28px; }
+    .connector-merge-label {
+      font-size: 11px; color: var(--ink-muted);
+      padding: 2px 8px; border: 1px dashed var(--border); border-radius: 4px;
+    }
+
+    /* Gap badge inline */
+    .gap-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin: 8px 0 0 0; padding: 3px 10px;
+      background: #fef8f6; border: 1px solid rgba(196, 69, 54, 0.25); border-radius: 20px;
+      font-size: 11px; font-weight: 500; color: var(--accent-red);
+      cursor: pointer; transition: all 0.15s;
+      text-decoration: none;
+    }
+    .gap-badge:hover { background: #fde8e4; border-color: rgba(196, 69, 54, 0.4); }
+    .gap-badge-icon { font-size: 12px; }
+
+    .gaps-section { margin-top: 32px; }
+    .gaps-section-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 16px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .gaps-section-title { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 700; color: var(--ink); }
+    .gaps-section-count { font-size: 11px; font-weight: 600; padding: 2px 8px; background: #fef8f6; color: var(--accent-red); border-radius: 10px; }
+    .gap-item {
+      padding: 20px 24px; margin-bottom: 12px;
+      background: var(--paper-card); border: 1px solid var(--border-light); border-radius: 8px;
+      border-left: 3px solid var(--accent-red);
+      box-shadow: var(--shadow-card); scroll-margin-top: 24px;
+    }
+    .gap-item-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .gap-item-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--accent-red); opacity: 0.7; }
+    .gap-item-ref { font-size: 11px; color: var(--ink-muted); }
+    .gap-item-desc { font-size: 14px; color: var(--ink-secondary); line-height: 1.8; }
+    .gap-item.highlight { animation: gapHighlight 1.5s ease-out; }
+    @keyframes gapHighlight {
+      0% { background: #fef0ed; border-color: var(--accent-red); }
+      100% { background: var(--paper-card); border-color: var(--border-light); }
+    }
+
+    .verdict { margin-top: 32px; padding: 24px; background: var(--paper-warm); border-radius: 8px; border: 1px solid var(--border); }
+    .verdict-label { font-size: 11px; letter-spacing: 0.2em; color: var(--ink-muted); text-transform: uppercase; margin-bottom: 8px; }
+    .verdict-text { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.5; }
+    .verdict-items { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+    .verdict-item { display: flex; gap: 10px; align-items: flex-start; }
+    .verdict-tag { flex-shrink: 0; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 4px; margin-top: 2px; }
+    .vt-solid { background: rgba(74, 124, 89, 0.12); color: var(--accent-green); }
+    .vt-weak { background: rgba(196, 69, 54, 0.12); color: var(--accent-red); }
+    .vt-advice { background: rgba(59, 107, 154, 0.12); color: var(--accent-blue); }
+    .verdict-item-text { font-family: 'Noto Serif SC', serif; font-size: 14px; color: var(--ink); line-height: 1.6; }
+    @keyframes fadeSlideUp {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .result-enter { animation: fadeSlideUp 0.4s ease-out both; }
+    .phase-enter { animation: fadeSlideUp 0.35s ease-out both; }
+    .verdict-enter { animation: fadeSlideUp 0.35s ease-out both; }
+    .claim-enter { animation: fadeSlideUp 0.3s ease-out both; }
+
+    /* Cancel button */
+    .btn-cancel {
+      background: transparent; color: var(--accent-red); border: 1px solid rgba(196,69,54,0.3);
+      font-size: 12px; padding: 5px 14px; border-radius: 5px; cursor: pointer;
+      font-family: 'Noto Sans SC', sans-serif; transition: all 0.15s;
+    }
+    .btn-cancel:hover { border-color: var(--accent-red); background: rgba(196,69,54,0.04); }
+    .btn-fetch {
+      padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--accent-blue);
+      color: var(--accent-blue); background: rgba(59,107,154,0.06);
+      transition: all 0.15s;
+    }
+    .btn-fetch:hover { background: rgba(59,107,154,0.12); }
+    .btn-fetch:disabled { opacity: 0.5; cursor: not-allowed; }
+    .url-hint {
+      font-size: 12px; color: var(--accent-blue); padding: 6px 0;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .url-hint-icon { font-size: 14px; }
+
+    /* Compatibility hints */
+    .compat-section {
+      margin-top: 20px; padding: 16px 20px;
+      background: var(--paper-warm); border: 1px solid var(--border);
+      border-radius: 8px; font-size: 13px; line-height: 1.7;
+      color: var(--ink-secondary);
+    }
+    .compat-row { display: flex; gap: 24px; flex-wrap: wrap; }
+    .compat-col { flex: 1; min-width: 180px; }
+    .compat-label {
+      font-size: 11px; font-weight: 600; color: var(--ink-muted);
+      margin-bottom: 4px; letter-spacing: 0.03em;
+    }
+    .compat-label-ok { color: var(--accent-green); }
+    .compat-label-no { color: var(--ink-muted); }
+    .compat-list { list-style: none; padding: 0; margin: 0; }
+    .compat-list li {
+      padding: 2px 0; font-size: 12px; color: var(--ink-secondary);
+    }
+    /* Disclaimer */
+    .disclaimer {
+      margin: 32px 0 0; padding: 16px 20px;
+      background: var(--paper-warm); border: 1px solid var(--border);
+      border-radius: 8px; font-size: 11px; line-height: 1.7;
+      color: var(--ink-muted);
+    }
+    .disclaimer-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+      color: var(--ink-secondary); margin-bottom: 4px; text-transform: uppercase;
+    }
+    .input-hint { font-size: 12px; color: var(--ink-muted); margin-top: 6px; }
+
+    /* Language toggle */
+    .lang-toggle {
+      display: inline-flex; align-items: center; gap: 0;
+      border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+      font-size: 12px; font-family: 'Noto Sans SC', sans-serif;
+    }
+    .lang-btn {
+      padding: 4px 10px; background: transparent; border: none;
+      cursor: pointer; color: var(--ink-muted); transition: all 0.15s;
+      font-family: inherit; font-size: inherit;
+    }
+    .lang-btn.active {
+      background: var(--ink); color: var(--paper-card); font-weight: 600;
+    }
+    .lang-btn:not(.active):hover { background: var(--paper-warm); }
+
+    /* Example article button */
+    .example-hint {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 12px; padding: 10px; border: 1px dashed var(--border);
+      border-radius: 8px; cursor: pointer; transition: all 0.15s;
+      font-size: 13px; color: var(--ink-muted); background: transparent;
+      width: 100%; font-family: 'Noto Sans SC', sans-serif;
+    }
+    .example-hint:hover { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(59,107,154,0.03); }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-wrapper { text-align: center; padding: 20px 0 40px; }
+    .loading-spinner {
+      display: inline-block; width: 28px; height: 28px;
+      border: 2.5px solid var(--border); border-top-color: var(--accent-blue);
+      border-radius: 50%; animation: spin 0.9s linear infinite; margin-bottom: 16px;
+    }
+    .loading-stage {
+      font-size: 14px; color: var(--ink-secondary); min-height: 24px;
+      transition: opacity 0.4s; line-height: 1.6;
+    }
+    .loading-timer {
+      font-size: 12px; color: var(--ink-muted); margin-top: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .loading-bar {
+      width: 200px; height: 3px; background: var(--border-light);
+      border-radius: 2px; margin: 14px auto 0; overflow: hidden;
+    }
+    .loading-bar-inner {
+      height: 100%; width: 0%; background: var(--accent-blue);
+      border-radius: 2px; transition: width 1s linear;
+    }
+    .skeleton { background: linear-gradient(90deg, var(--border-light) 25%, var(--paper-warm) 50%, var(--border-light) 75%); background-size: 800px 100%; animation: shimmer 1.5s infinite; border-radius: 4px; }
+    .skeleton-card { padding: 20px 24px; background: var(--paper-card); border: 1px solid var(--border-light); border-radius: 8px; margin-bottom: 8px; }
+    .skeleton-line { height: 14px; margin-bottom: 10px; }
+    .skeleton-line.w60 { width: 60%; }
+    .skeleton-line.w80 { width: 80%; }
+    .skeleton-line.w40 { width: 40%; }
+    .shelf-overlay { position: fixed; inset: 0; z-index: 100; display: flex; }
+    .shelf-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.25); cursor: pointer; border: none; }
+    .shelf-panel { position: relative; z-index: 101; width: 380px; max-width: 90vw; height: 100%; background: var(--paper-card); border-right: 1px solid var(--border); padding: 32px 24px; overflow-y: auto; box-shadow: 4px 0 24px rgba(0,0,0,0.06); }
+    .shelf-title { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+    .shelf-item { padding: 16px; border: 1px solid var(--border-light); border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: all 0.15s; }
+    .shelf-item:hover { border-color: var(--border); box-shadow: var(--shadow-card); }
+    .shelf-item-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+    .shelf-item-claim { font-size: 13px; color: var(--ink-secondary); margin-top: 6px; line-height: 1.5; }
+    .shelf-item-meta { display: flex; align-items: center; gap: 12px; margin-top: 10px; font-size: 11px; color: var(--ink-muted); }
+    .shelf-item-actions { display: flex; gap: 12px; margin-top: 10px; }
+    .shelf-item-actions button { font-size: 12px; background: none; border: none; cursor: pointer; font-family: 'Noto Sans SC', sans-serif; padding: 0; }
+    .shelf-btn-load { color: var(--accent-blue); }
+    .shelf-btn-load:hover { text-decoration: underline; }
+    .shelf-btn-delete { color: var(--accent-red); }
+    .shelf-btn-delete:hover { text-decoration: underline; }
+    .shelf-empty { font-size: 14px; color: var(--ink-muted); margin-top: 20px; }
+    .error-box { padding: 16px 20px; background: #fef8f6; border: 1px solid #f0c8c2; border-radius: 8px; font-size: 13px; color: var(--accent-red); margin-bottom: 24px; line-height: 1.6; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); }
+    .modal-card { width: 360px; max-width: 90vw; background: var(--paper-card); border: 1px solid var(--border); border-radius: 10px; padding: 24px; box-shadow: var(--shadow-soft); }
+    .modal-title { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+    .modal-body { font-size: 14px; color: var(--ink-secondary); margin-bottom: 16px; }
+    .modal-actions { display: flex; justify-content: flex-end; }
+    @media (max-width: 640px) {
+      .header { padding: 32px 0 20px; }
+      .header-brand { font-size: 24px; }
+      .header-title { font-size: 18px; }
+      .header-row { flex-direction: column; }
+      .header-actions { margin-top: 12px; width: 100%; justify-content: flex-start; }
+      .claim-banner { padding: 24px; }
+      .claim-text { font-size: 17px; }
+      .claim-metrics { flex-direction: column; gap: 16px; }
+      .spine { padding-left: 24px; }
+      .step-card { padding: 16px; }
+      .compat-row { flex-direction: column; gap: 12px; }
+      .compat-col { min-width: unset; }
+    }
+  </style>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useCallback, useRef } = React;
+
+    /* 鈹€鈹€ i18n 鈹€鈹€ */
+    let currentLang = 'en';
+
+    const I18N = {
+      // Type labels
+      origin:     { zh: '\u8D77\u70B9', en: 'Origin' },
+      setup:      { zh: '\u94FA\u57AB', en: 'Setup' },
+      reasoning:  { zh: '\u63A8\u5BFC', en: 'Reasoning' },
+      turning:    { zh: '\u8F6C\u6298', en: 'Turning' },
+      conclusion: { zh: '\u7ED3\u8BBA', en: 'Conclusion' },
+      // Header
+      headerTitle:   { zh: '\u8BBA\u8BC1\u9AA8\u67B6\uFF0C\u4E00\u76EE\u4E86\u7136', en: 'Argument Skeleton, At a Glance' },
+      headerSub:     { zh: '\u7C98\u8D34\u6587\u7AE0\u6216\u94FE\u63A5\uFF0C\u63D0\u53D6\u8BBA\u8BC1\u8109\u7EDC\u3002\u8FA8\u5176\u4E3B\u5F20\uFF0C\u5BDF\u5176\u903B\u8F91\uFF0C\u65AD\u5176\u5F97\u5931\u3002', en: 'Paste an article or URL. Extract its reasoning chain. See what it claims, whether the logic holds, and if it is worth a close read.' },
+      // Buttons
+      analyze:       { zh: '\u5206\u6790', en: 'Analyze' },
+      analyzing:     { zh: '\u5206\u6790\u4E2D\u2026', en: 'Analyzing\u2026' },
+      cancel:        { zh: '\u53D6\u6D88', en: 'Cancel' },
+      expand:        { zh: '\u5C55\u5F00', en: 'Expand' },
+      collapse:      { zh: '\u6536\u8D77', en: 'Collapse' },
+      close:         { zh: '\u5173\u95ED', en: 'Close' },
+      load:          { zh: '\u52A0\u8F7D', en: 'Load' },
+      del:           { zh: '\u5220\u9664', en: 'Delete' },
+      // Input
+      placeholder:   { zh: '\u5728\u6B64\u7C98\u8D34\u6587\u7AE0\u5168\u6587\u6216\u94FE\u63A5\u2026', en: 'Paste article text or URL\u2026' },
+      usuallyTakes:  { zh: '\u901A\u5E38\u9700\u8981 15\u201330 \u79D2', en: 'Usually takes 15\u201330 seconds' },
+      tryExample:    { zh: '\u{1F4DD} \u8BD5\u8BD5\u770B \u2192 \u52A0\u8F7D\u793A\u4F8B\u6587\u7AE0', en: '\u{1F4DD} Try it \u2192 Load example article' },
+      charUnit:      { zh: '\u5B57', en: 'chars' },
+      // Errors
+      errEmpty:      { zh: '\u8BF7\u5148\u7C98\u8D34\u6587\u7AE0\u3002', en: 'Please paste an article first.' },
+      errShort:      { zh: '\u6587\u7AE0\u5185\u5BB9\u8FC7\u77ED\uFF0C\u8BF7\u7C98\u8D34\u81F3\u5C11 100 \u5B57\u7684\u6587\u7AE0\u3002', en: 'Article too short. Please paste at least 100 characters.' },
+      errLong:       { zh: '\u6587\u7AE0\u5185\u5BB9\u8D85\u8FC7 50000 \u5B57\u9650\u5236\uFF0C\u8BF7\u7F29\u51CF\u540E\u91CD\u8BD5\u3002', en: 'Article exceeds 50,000 character limit. Please shorten and retry.' },
+      errServer:     { zh: '\u670D\u52A1\u5668\u9519\u8BEF', en: 'Server error' },
+      errFailed:     { zh: '\u5206\u6790\u5931\u8D25', en: 'Analysis failed' },
+      // Claim banner
+      coreClaim:     { zh: '\u6838\u5FC3\u4E3B\u5F20', en: 'Core Claim' },
+      argDensity:    { zh: '\u8BBA\u8BC1\u5BC6\u5EA6', en: 'Argument Density' },
+      claimClarity:  { zh: '\u65AD\u8A00\u6E05\u6670\u5EA6', en: 'Claim Clarity' },
+      logicComplete: { zh: '\u903B\u8F91\u5B8C\u6574\u5EA6', en: 'Logic Completeness' },
+      complete:      { zh: '\u5B8C\u6574', en: 'Complete' },
+      gapUnit:       { zh: '\u5904\u7F3A\u53E3', en: ' gaps' },
+      // Clarity values (used for matching API output)
+      high:          { zh: '\u9AD8', en: 'High' },
+      medium:        { zh: '\u4E2D', en: 'Medium' },
+      low:           { zh: '\u4F4E', en: 'Low' },
+      // Detail panel
+      evidence:      { zh: '\u5C55\u5F00\u8BBA\u636E', en: 'Evidence' },
+      selectNode:    { zh: '\u2190 \u70B9\u51FB\u5DE6\u4FA7\u8282\u70B9\u67E5\u770B\u8BE6\u60C5', en: '\u2190 Click a node on the left to view details' },
+      // Gaps
+      logicGap:      { zh: '\u903B\u8F91\u7F3A\u53E3', en: 'Logic Gap' },
+      logicGaps:     { zh: '\u903B\u8F91\u7F3A\u53E3', en: 'Logic Gaps' },
+      gapCountUnit:  { zh: '\u5904', en: '' },
+      refOnly:       { zh: '\u4EC5\u4F9B\u53C2\u8003', en: 'For reference only' },
+      impactHigh:    { zh: '\u5F71\u54CD\uFF1A\u9AD8', en: 'Impact: High' },
+      impactMed:     { zh: '\u5F71\u54CD\uFF1A\u4E2D', en: 'Impact: Medium' },
+      impactLow:     { zh: '\u5F71\u54CD\uFF1A\u4F4E', en: 'Impact: Low' },
+      // Verdict
+      verdict:       { zh: '\u4E00\u53E5\u8BDD\u5224\u51B3', en: 'Verdict' },
+      strongest:     { zh: '\u6700\u624E\u5B9E', en: 'Strongest' },
+      weakest:       { zh: '\u6700\u8584\u5F31', en: 'Weakest' },
+      readAdvice:    { zh: '\u9605\u8BFB\u5EFA\u8BAE', en: 'Reading Advice' },
+      // Loading
+      loadingTitle:  { zh: '\u5206\u6790\u4E2D', en: 'Analyzing' },
+      elapsed:       { zh: '\u5DF2\u7B49\u5F85 ', en: 'Elapsed: ' },
+      secUnit:       { zh: '\u79D2', en: 's' },
+      loading0:      { zh: '\u6B63\u5728\u63D0\u53D6\u6587\u7AE0\u7ED3\u6784\u2026', en: 'Extracting article structure\u2026' },
+      loading1:      { zh: '\u6B63\u5728\u8BC6\u522B\u8BBA\u8BC1\u8D77\u70B9\u4E0E\u7EC8\u70B9\u2026', en: 'Identifying argument origin and conclusion\u2026' },
+      loading2:      { zh: '\u6B63\u5728\u8FFD\u8E2A\u63A8\u7406\u94FE\u6761\u2026', en: 'Tracing reasoning chains\u2026' },
+      loading3:      { zh: '\u6B63\u5728\u6807\u6CE8\u8282\u70B9\u95F4\u7684\u903B\u8F91\u5173\u7CFB\u2026', en: 'Mapping logical connectors\u2026' },
+      loading4:      { zh: '\u6B63\u5728\u68C0\u67E5\u8BBA\u8BC1\u7F3A\u53E3\u2026', en: 'Checking for logic gaps\u2026' },
+      loading5:      { zh: '\u6B63\u5728\u751F\u6210\u9605\u8BFB\u5EFA\u8BAE\u2026', en: 'Generating reading advice\u2026' },
+      loading6:      { zh: '\u5373\u5C06\u5B8C\u6210\uFF0C\u8BF7\u7A0D\u5019\u2026', en: 'Almost done, please wait\u2026' },
+      // Shelf
+      shelf:         { zh: '\u9605\u8BFB\u4E66\u67B6', en: 'Reading Shelf' },
+      shelfBtn:      { zh: '\u4E66\u67B6', en: 'Shelf' },
+      shelfEmpty:    { zh: '\u8FD8\u6CA1\u6709\u5206\u6790\u8BB0\u5F55\u3002', en: 'No analysis records yet.' },
+      // Footer
+      privacy:       { zh: '\u9690\u79C1\u653F\u7B56', en: 'Privacy Policy' },
+      terms:         { zh: '\u4F7F\u7528\u6761\u6B3E', en: 'Terms of Use' },
+      aiDisclaimer:  { zh: 'AI \u5206\u6790\u7ED3\u679C\u4EC5\u4F9B\u53C2\u8003', en: 'AI analysis for reference only' },
+      // URL fetch
+      fetchBtn:      { zh: '\u83B7\u53D6\u6587\u7AE0', en: 'Fetch Article' },
+      fetching:      { zh: '\u6B63\u5728\u83B7\u53D6\u2026', en: 'Fetching\u2026' },
+      urlDetected:   { zh: '\u68C0\u6D4B\u5230\u94FE\u63A5\uFF0C\u70B9\u51FB\u201C\u83B7\u53D6\u6587\u7AE0\u201D\u63D0\u53D6\u6B63\u6587', en: 'URL detected. Click "Fetch Article" to extract text.' },
+      fetchFailed:   { zh: '\u65E0\u6CD5\u63D0\u53D6\u8BE5\u94FE\u63A5\u5185\u5BB9\uFF0C\u8BF7\u590D\u5236\u6587\u7AE0\u5168\u6587\u7C98\u8D34\u5230\u8F93\u5165\u6846', en: 'Could not extract content. Please copy and paste the article text directly.' },
+      fetchSuccess:  { zh: '\u6587\u7AE0\u5DF2\u63D0\u53D6\uFF0C\u70B9\u51FB\u201C\u5206\u6790\u201D\u5F00\u59CB', en: 'Article extracted. Click "Analyze" to start.' },
+      // Misc
+      unnamed:       { zh: '\u672A\u547D\u540D', en: 'Untitled' },
+      argMainLine:   { zh: '\u8BBA\u8BC1\u4E3B\u7EBF', en: 'Main Argument' },
+      logicGapFb:    { zh: '\u903B\u8F91\u7F3A\u53E3', en: 'Logic Gap' },
+      // Disclaimer
+      disclaimerTitle: { zh: '\u514D\u8D23\u58F0\u660E', en: 'Disclaimer' },
+      disclaimerText:  { zh: 'Lumen \u662F\u4E00\u4E2A\u81EA\u52A8\u5316\u5206\u6790\u5DE5\u5177\u3002\u672C\u670D\u52A1\u4E0D\u5BF9\u7528\u6237\u63D0\u4EA4\u7684\u6587\u7AE0\u5185\u5BB9\u627F\u62C5\u4EFB\u4F55\u8D23\u4EFB\uFF0C\u4EA6\u4E0D\u5BF9 AI \u751F\u6210\u7684\u5206\u6790\u7ED3\u679C\u7684\u51C6\u786E\u6027\u3001\u5B8C\u6574\u6027\u6216\u9002\u7528\u6027\u4F5C\u4EFB\u4F55\u4FDD\u8BC1\u3002\u5206\u6790\u7ED3\u679C\u4EC5\u4F9B\u53C2\u8003\uFF0C\u4E0D\u6784\u6210\u4E13\u4E1A\u5EFA\u8BAE\u3002\u7528\u6237\u5E94\u81EA\u884C\u5224\u65AD\u5206\u6790\u5185\u5BB9\u7684\u53EF\u9760\u6027\u3002', en: 'Lumen is an automated analysis tool. This service assumes no responsibility for the content of articles submitted by users, nor does it guarantee the accuracy, completeness, or fitness for purpose of AI-generated analysis. All results are provided for reference only and do not constitute professional advice. Users should exercise their own judgment regarding the reliability of the analysis.' },
+    };
+
+    function t(key) { return (I18N[key] && I18N[key][currentLang]) || (I18N[key] && I18N[key]['en']) || key; }
+
+    function isUrl(str) {
+      const trimmed = str.trim();
+      if (trimmed.includes('\n') || trimmed.length > 2048) return false;
+      return /^https?:\/\/[^\s]+$/i.test(trimmed);
+    }
+
+    function getLoadingStages() { return [t('loading0'), t('loading1'), t('loading2'), t('loading3'), t('loading4'), t('loading5'), t('loading6')]; }
+
+    async function analyzeArticle(text) {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || (t('errServer') + ' ' + res.status));
+      }
+      return res.json();
+    }
+
+    const HISTORY_KEY = 'lumen_history';
+    function loadHistory() {
+      try { const r = localStorage.getItem(HISTORY_KEY); return r ? JSON.parse(r) : []; } catch { return []; }
+    }
+    function saveHistory(items) { localStorage.setItem(HISTORY_KEY, JSON.stringify(items)); }
+    function inferTitle(text) {
+      if (!text) return t('unnamed');
+      const line = text.split('\n').map(l => l.trim()).find(Boolean) || '';
+      const clean = line.replace(/^#+\s*/, '');
+      return clean.length <= 20 ? clean : clean.slice(0, 20) + '\u2026';
+    }
+
+    const typeMap = {
+      origin:     { label: t('origin'), tagClass: 'tag-origin', dotClass: 'dot-origin' },
+      setup:      { label: t('setup'), tagClass: 'tag-setup', dotClass: 'dot-setup' },
+      reasoning:  { label: t('reasoning'), tagClass: 'tag-reasoning', dotClass: 'dot-reasoning' },
+      turning:    { label: t('turning'), tagClass: 'tag-turning', dotClass: 'dot-turning' },
+      conclusion: { label: t('conclusion'), tagClass: 'tag-conclusion', dotClass: 'dot-conclusion' },
+    };
+
+    function circledNumber(n) {
+      const circled = ['\u2460','\u2461','\u2462','\u2463','\u2464','\u2465','\u2466','\u2467','\u2468','\u2469'];
+      return n >= 1 && n <= 10 ? circled[n - 1] : '(' + n + ')';
+    }
+
+    function ClaimBanner({ analysis }) {
+      const gapCount = (analysis.phases || []).reduce((sum, p) => sum + (p.gaps?.length || 0), 0);
+      const clarityDot = (analysis.claim_clarity === '\u9AD8' || analysis.claim_clarity === 'High') ? 'dot-green' : (analysis.claim_clarity === '\u4E2D' || analysis.claim_clarity === 'Medium') ? 'dot-yellow' : 'dot-red';
+      const gapDot = gapCount === 0 ? 'dot-green' : gapCount <= 2 ? 'dot-yellow' : 'dot-red';
+      const completeness = analysis.logic_completeness || (gapCount === 0 ? t('complete') : (gapCount + t('gapUnit')));
+      return (
+        <div className="claim-banner">
+          <div className="claim-label">{t('coreClaim')}</div>
+          <div className="claim-text">{analysis.core_claim}</div>
+          <div className="claim-metrics">
+            <div className="metric">
+              <span className="metric-label">{t('argDensity')}</span>
+              <span className="metric-value">{analysis.argument_density}</span>
+            </div>
+            <div className="metric">
+              <span className="metric-label">{t('claimClarity')}</span>
+              <span className="metric-value"><span className={`metric-dot ${clarityDot}`}></span>{analysis.claim_clarity}</span>
+            </div>
+            <div className="metric">
+              <span className="metric-label">{t('logicComplete')}</span>
+              <span className="metric-value"><span className={`metric-dot ${gapDot}`}></span>{completeness}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function NodeCard({ node, expanded, onToggle, gapBadges, selected, onClick }) {
+      const typeInfo = typeMap[node.type] || typeMap.setup;
+      const isTurning = node.type === 'turning';
+      const level = node.level || 1;
+
+      return (
+        <div className={`step ${level === 2 ? 'level-2' : ''}`}>
+          <div className={`step-dot ${t.dotClass}`}></div>
+          <div className={`step-card ${isTurning ? 'turning' : ''} ${selected ? 'selected' : ''}`} onClick={onClick}>
+            <div className="step-header">
+              <div style={{flex: 1}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap'}}>
+                  <span className="step-title">{node.title}</span>
+                  <span className={`step-tag ${typeInfo.tagClass}`}>{typeInfo.label}</span>
+                </div>
+                {!expanded && node.one_liner && <p className="step-summary">{node.one_liner}</p>}
+                {expanded && <p className="step-summary">{node.summary}</p>}
+                {expanded && (
+                  <div className="node-inline-detail">
+                    {node.evidence && <div className="step-detail">{node.evidence}</div>}
+                    {node.transition && <div className="step-detail" style={{fontStyle:'italic',color:'var(--ink-muted)'}}>{node.transition}</div>}
+                  </div>
+                )}
+                {gapBadges}
+              </div>
+              <button className="step-toggle" onClick={(e) => { e.stopPropagation(); onToggle(node.id); }}>
+                {expanded ? t('collapse') : t('expand')}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ConnectorLine({ connector }) {
+      if (!connector) return null;
+
+      if (connector.type === 'fork') {
+        return (
+          <div className="connector connector-fork">
+            <span className="connector-fork-label">{'\u2442 '}{connector.label}</span>
+          </div>
+        );
+      }
+      if (connector.type === 'merge') {
+        return (
+          <div className="connector connector-merge">
+            <span className="connector-merge-label">{'\u2198 '}{connector.label}</span>
+          </div>
+        );
+      }
+      const isRebuttal = connector.type === 'rebuttal';
+      return (
+        <div className="connector">
+          <span className={`connector-text ${isRebuttal ? 'turning-connector' : ''}`}>
+            {connector.label}
+          </span>
+        </div>
+      );
+    }
+
+    function PhaseSection({ phase, phaseIndex, openCards, onToggle, expandedPhases, onTogglePhase }) {
+      const isOpen = expandedPhases.has(phase.id);
+      const nodes = phase.nodes || [];
+      const connectors = phase.connectors || [];
+      const gaps = phase.gaps || [];
+      const [selectedNode, setSelectedNode] = useState(nodes[0]?.id || null);
+      const [expandedGaps, setExpandedGaps] = useState(new Set());
+      const bodyRef = useRef(null);
+      const resizerRef = useRef(null);
+
+      const isWide = () => window.matchMedia('(min-width: 780px)').matches;
+
+      React.useEffect(() => {
+        if (nodes[0]?.id) setSelectedNode(nodes[0].id);
+      }, [phase.id, nodes.length]);
+
+      /* Draggable resizer */
+      React.useEffect(() => {
+        const resizer = resizerRef.current;
+        const body = bodyRef.current;
+        if (!resizer || !body) return;
+        let startX = 0, startW = 0, mapEl = null;
+
+        const onMouseMove = (e) => {
+          if (!mapEl) return;
+          const delta = e.clientX - startX;
+          const newW = Math.max(200, Math.min(startW + delta, body.clientWidth - 200));
+          mapEl.style.flex = '0 0 ' + newW + 'px';
+        };
+        const onMouseUp = () => {
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+          resizer.classList.remove('dragging');
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+        };
+        const onMouseDown = (e) => {
+          e.preventDefault();
+          mapEl = body.querySelector('.phase-map');
+          if (!mapEl) return;
+          startX = e.clientX;
+          startW = mapEl.getBoundingClientRect().width;
+          resizer.classList.add('dragging');
+          document.body.style.cursor = 'col-resize';
+          document.body.style.userSelect = 'none';
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        };
+        resizer.addEventListener('mousedown', onMouseDown);
+        return () => { resizer.removeEventListener('mousedown', onMouseDown); };
+      });
+
+      const toggleGap = (gapKey) => {
+        setExpandedGaps(prev => {
+          const next = new Set(prev);
+          next.has(gapKey) ? next.delete(gapKey) : next.add(gapKey);
+          return next;
+        });
+      };
+
+      const gapMap = {};
+      gaps.forEach((g, i) => {
+        if (!gapMap[g.after_node]) gapMap[g.after_node] = [];
+        gapMap[g.after_node].push({ index: i, gap: g });
+      });
+
+      const findConnector = (currentNodeId, nextNodeId) => {
+        return connectors.find(c => {
+          if (c.type === 'fork') return c.from === currentNodeId;
+          if (c.type === 'merge') return Array.isArray(c.from) && c.from.includes(currentNodeId) && c.to === nextNodeId;
+          return c.from === currentNodeId;
+        });
+      };
+
+      const phaseColors = ['var(--accent-blue)', 'var(--accent-amber)', 'var(--accent-red)', '#9b85c4', 'var(--accent-green)'];
+      const color = phaseColors[(phaseIndex) % phaseColors.length];
+
+      const handleNodeAction = (nodeId) => {
+        if (isWide()) {
+          setSelectedNode(nodeId);
+          return;
+        }
+        onToggle(nodeId);
+      };
+
+      const severityLabel = (s) => s === 'high' ? t('impactHigh') : s === 'medium' ? t('impactMed') : t('impactLow');
+
+      return (
+        <div className={`phase-section ${isOpen ? 'open' : ''}`}>
+          <div className="phase-header" onClick={() => onTogglePhase(phase.id)} style={{cursor: 'pointer'}}>
+            <div className="phase-num" style={{background: color}}>{phase.id}</div>
+            <div className="phase-info">
+              <div className="phase-title-text">{phase.title}</div>
+              <div className="phase-subtitle-text">{phase.subtitle}</div>
+            </div>
+            <span className="phase-arrow" style={{transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s'}}>{'\u25B8'}</span>
+          </div>
+          {isOpen && (
+            <div className="phase-body-content">
+              <div className="phase-body-inner" ref={bodyRef}>
+                <div className="phase-map">
+                  <div className="spine">
+                    {nodes.map((node, i) => {
+                      const gapBadgesForNode = gapMap[node.id] ? (
+                        <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px'}}>
+                          {gapMap[node.id].map(({index, gap}) => (
+                            <a key={index} className="gap-badge" onClick={(e) => {
+                              e.stopPropagation();
+                              const el = document.getElementById('gap-' + phase.id + '-' + index);
+                              if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+                            }}>
+                              <span className="gap-badge-icon">{'\u26A0'}</span>
+                              <span>{gap.title || t('logicGap')}</span>
+                            </a>
+                          ))}
+                        </div>
+                      ) : null;
+
+                      const conn = i < nodes.length - 1 ? findConnector(node.id, nodes[i + 1]?.id) : null;
+
+                      return (
+                        <React.Fragment key={node.id}>
+                          <NodeCard
+                            node={node}
+                            expanded={openCards.has(node.id)}
+                            onToggle={handleNodeAction}
+                            onClick={() => handleNodeAction(node.id)}
+                            selected={selectedNode === node.id}
+                            gapBadges={gapBadgesForNode}
+                          />
+                          {conn && <ConnectorLine connector={conn} />}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="phase-resizer" ref={resizerRef}></div>
+                <div className="phase-detail-panel">
+                  {!selectedNode && <div className="detail-empty">{t('selectNode')}</div>}
+                  {selectedNode && (() => {
+                    const node = nodes.find(n => n.id === selectedNode);
+                    if (!node) return <div className="detail-empty">{t('selectNode')}</div>;
+                    const typeInfo = typeMap[node.type] || typeMap.setup;
+                    return (
+                      <div className="detail-card active">
+                        <div className="dp-header">
+                          <div className="dp-title">{node.title}</div>
+                          <span className={'dp-type dpt-' + node.type}>{typeInfo.label}</span>
+                        </div>
+                        <div className="dp-summary">{node.summary}</div>
+                        <div className="dp-label">{t('evidence')}</div>
+                        <div className="dp-body">{node.evidence}</div>
+                        {node.transition && <div className="dp-transition">{node.transition}</div>}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+              {gaps.length > 0 && (
+                <div className="gaps-section" style={{marginTop: '16px'}}>
+                  <div className="gaps-section-header">
+                    <span className="gaps-section-title">{t('logicGaps')}</span>
+                    <span className="gaps-section-count">{gaps.length + t('gapCountUnit')}</span>
+                    <span style={{fontSize:'11px', color:'var(--ink-muted)', marginLeft:'auto'}}>{t('refOnly')}</span>
+                  </div>
+                  {gaps.map((g, i) => {
+                    const gapKey = phase.id + '-' + i;
+                    const isGapOpen = expandedGaps.has(gapKey);
+                    return (
+                      <div key={i} id={'gap-' + phase.id + '-' + i} className={'gap-item' + (isGapOpen ? ' open' : '')} onClick={() => toggleGap(gapKey)}>
+                        <div className="gap-item-header">
+                          <span className="gap-item-label">{'\u26A0 '}{g.title || t('logicGap')}</span>
+                          <span className="gap-item-ref" style={{marginLeft: '8px'}}>
+                            {severityLabel(g.severity)}
+                          </span>
+                          <span className={'gap-item-toggle' + (isGapOpen ? ' open' : '')}>{'\u25B8'}</span>
+                        </div>
+                        <div className="gap-item-desc">{g.detail}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function Verdict({ verdict }) {
+      if (!verdict) return null;
+
+      if (typeof verdict === 'string') {
+        return (
+          <div className="verdict">
+            <div className="verdict-label">{t('verdict')}</div>
+            <div className="verdict-text">{verdict}</div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="verdict">
+          <div className="verdict-label">{t('verdict')}</div>
+          <div className="verdict-items">
+            <div className="verdict-item">
+              <span className="verdict-tag vt-solid">{t('strongest')}</span>
+              <span className="verdict-item-text">{verdict.strongest}</span>
+            </div>
+            <div className="verdict-item">
+              <span className="verdict-tag vt-weak">{t('weakest')}</span>
+              <span className="verdict-item-text">{verdict.weakest}</span>
+            </div>
+            <div className="verdict-item">
+              <span className="verdict-tag vt-advice">{t('readAdvice')}</span>
+              <span className="verdict-item-text">{verdict.reading_advice}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function SkeletonSpine() {
+      return (
+        <div className="spine">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="skeleton-card">
+              <div className="skeleton skeleton-line w60"></div>
+              <div className="skeleton skeleton-line w80"></div>
+              <div className="skeleton skeleton-line w40"></div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function getExampleArticle() { return currentLang === 'zh'
+      ? '\u8FD1\u5E74\u6765\uFF0C\u4EBA\u5DE5\u667A\u80FD\u6280\u672F\u7684\u8FC5\u731B\u53D1\u5C55\u5F15\u53D1\u4E86\u5E7F\u6CDB\u7684\u793E\u4F1A\u8BA8\u8BBA\u3002\u652F\u6301\u8005\u8BA4\u4E3A\uFF0CAI\u5C06\u6781\u5927\u63D0\u5347\u751F\u4EA7\u6548\u7387\uFF0C\u521B\u9020\u65B0\u7684\u5C31\u4E1A\u673A\u4F1A\uFF0C\u5E76\u89E3\u51B3\u8BB8\u591A\u957F\u671F\u56F0\u6270\u4EBA\u7C7B\u7684\u96BE\u9898\u3002\u4F8B\u5982\uFF0C\u5728\u533B\u7597\u9886\u57DF\uFF0CAI\u5DF2\u7ECF\u80FD\u591F\u8F85\u52A9\u8BCA\u65AD\u67D0\u4E9B\u75BE\u75C5\uFF0C\u51C6\u786E\u7387\u8D85\u8FC7\u4EBA\u7C7B\u533B\u751F\u3002\u5728\u79D1\u5B66\u7814\u7A76\u4E2D\uFF0CAlphaFold\u6210\u529F\u9884\u6D4B\u4E86\u8D85\u8FC72\u4EBF\u4E2A\u86CB\u767D\u8D28\u7684\u7ED3\u6784\uFF0C\u8FD9\u4E00\u7A81\u7834\u53EF\u80FD\u52A0\u901F\u836F\u7269\u7814\u53D1\u8FDB\u7A0B\u3002\n\n\u7136\u800C\uFF0C\u53CD\u5BF9\u8005\u6307\u51FA\u4E86\u51E0\u4E2A\u5173\u952E\u95EE\u9898\u3002\u9996\u5148\uFF0CAI\u53EF\u80FD\u5BFC\u81F4\u5927\u89C4\u6A21\u5931\u4E1A\u3002\u6839\u636E\u9EA6\u80AF\u9521\u7684\u7814\u7A76\uFF0C\u52302030\u5E74\uFF0C\u5168\u7403\u53EF\u80FD\u6709\u591A\u8FBE8\u4EBF\u4E2A\u5DE5\u4F5C\u5C97\u4F4D\u88AB\u81EA\u52A8\u5316\u53D6\u4EE3\u3002\u867D\u7136\u5386\u53F2\u4E0A\u6BCF\u6B21\u6280\u672F\u9769\u547D\u90FD\u521B\u9020\u4E86\u65B0\u5C97\u4F4D\uFF0C\u4F46\u8FD9\u6B21\u7684\u901F\u5EA6\u548C\u89C4\u6A21\u53EF\u80FD\u8D85\u8FC7\u793E\u4F1A\u7684\u9002\u5E94\u80FD\u529B\u3002\n\n\u5176\u6B21\uFF0CAI\u7684\u201C\u9ED1\u7BB1\u201D\u95EE\u9898\u4EE4\u4EBA\u62C5\u5FE7\u3002\u5F53AI\u7CFB\u7EDF\u505A\u51FA\u5173\u4E4E\u4EBA\u547D\u7684\u51B3\u7B56\u65F6\u2014\u2014\u6BD4\u5982\u81EA\u52A8\u9A7E\u9A76\u6216\u533B\u7597\u8BCA\u65AD\u2014\u2014\u6211\u4EEC\u5374\u5F80\u5F80\u65E0\u6CD5\u7406\u89E3\u5B83\u7684\u63A8\u7406\u8FC7\u7A0B\u3002\u8FD9\u4E0D\u4EC5\u662F\u6280\u672F\u95EE\u9898\uFF0C\u66F4\u662F\u4F26\u7406\u95EE\u9898\uFF1A\u6211\u4EEC\u662F\u5426\u5E94\u8BE5\u5C06\u91CD\u5927\u51B3\u7B56\u59D4\u6258\u7ED9\u4E00\u4E2A\u6211\u4EEC\u65E0\u6CD5\u5B8C\u5168\u7406\u89E3\u7684\u7CFB\u7EDF\uFF1F\n\n\u7B2C\u4E09\uFF0C\u6570\u636E\u9690\u79C1\u548C\u5B89\u5168\u98CE\u9669\u4E0D\u5BB9\u5FFD\u89C6\u3002\u8BAD\u7EC3AI\u9700\u8981\u6D77\u91CF\u6570\u636E\uFF0C\u8FD9\u4E9B\u6570\u636E\u7684\u6536\u96C6\u548C\u4F7F\u7528\u5F80\u5F80\u6D89\u53CA\u4E2A\u4EBA\u9690\u79C1\u3002\u6B27\u76DFGDPR\u7684\u5B9E\u65BD\u8868\u660E\uFF0C\u793E\u4F1A\u5DF2\u7ECF\u5F00\u59CB\u91CD\u89C6\u8FD9\u4E00\u95EE\u9898\uFF0C\u4F46\u76D1\u7BA1\u59CB\u7EC8\u843D\u540E\u4E8E\u6280\u672F\u53D1\u5C55\u3002\n\n\u7EFC\u5408\u6765\u770B\uFF0CAI\u6280\u672F\u7684\u53D1\u5C55\u662F\u4E00\u628A\u53CC\u5203\u5251\u3002\u5173\u952E\u4E0D\u5728\u4E8E\u662F\u5426\u53D1\u5C55AI\uFF0C\u800C\u5728\u4E8E\u5982\u4F55\u5EFA\u7ACB\u6709\u6548\u7684\u6CBB\u7406\u6846\u67B6\u3002\u8FD9\u9700\u8981\u6280\u672F\u754C\u3001\u653F\u7B56\u5236\u5B9A\u8005\u548C\u516C\u4F17\u7684\u5171\u540C\u53C2\u4E0E\uFF0C\u4EE5\u786E\u4FDD AI\u7684\u53D1\u5C55\u65B9\u5411\u7B26\u5408\u4EBA\u7C7B\u7684\u6574\u4F53\u5229\u76CA\u3002'
+      : 'In recent years, the rapid development of artificial intelligence has sparked widespread debate. Supporters argue that AI will dramatically boost productivity, create new employment opportunities, and solve many problems that have long plagued humanity. In healthcare, AI can already assist in diagnosing certain diseases with accuracy exceeding that of human doctors. In scientific research, AlphaFold has successfully predicted the structures of over 200 million proteins, a breakthrough that could accelerate drug development.\n\nHowever, critics have raised several key concerns. First, AI may cause massive unemployment. According to McKinsey research, by 2030, up to 800 million jobs globally could be displaced by automation. While every past technological revolution created new positions, the speed and scale this time may exceed society\'s ability to adapt.\n\nSecond, the "black box" problem is alarming. When AI systems make life-or-death decisions\u2014such as autonomous driving or medical diagnosis\u2014we often cannot understand their reasoning process. This is not merely a technical issue but an ethical one: should we delegate critical decisions to a system we cannot fully comprehend?\n\nThird, data privacy and security risks cannot be ignored. Training AI requires massive datasets, and the collection and use of this data often involves personal privacy. The EU\'s implementation of GDPR shows that society has begun to take this issue seriously, but regulation consistently lags behind technological development.\n\nOverall, the development of AI technology is a double-edged sword. The key is not whether to develop AI, but how to establish effective governance frameworks. This requires the joint participation of the tech industry, policymakers, and the public to ensure that AI development aligns with humanity\'s collective interests.'; }
+
+    function LoadingState() {
+      const [stageIdx, setStageIdx] = useState(0);
+      const [elapsed, setElapsed] = useState(0);
+
+      React.useEffect(() => {
+        const timer = setInterval(() => setElapsed(e => e + 1), 1000);
+        return () => clearInterval(timer);
+      }, []);
+
+      React.useEffect(() => {
+        const interval = setInterval(() => {
+          setStageIdx(prev => prev < getLoadingStages().length - 1 ? prev + 1 : prev);
+        }, 4000);
+        return () => clearInterval(interval);
+      }, []);
+
+      const progress = Math.min(95, (elapsed / 35) * 100);
+      const mins = Math.floor(elapsed / 60);
+      const secs = elapsed % 60;
+      const timeStr = mins > 0
+        ? (mins + ':' + (secs < 10 ? '0' : '') + secs)
+        : (secs + t('secUnit'));
+
+      return (
+        <div className="result-section">
+          <div className="claim-banner" style={{opacity: 0.6, animation: 'pulse 2s ease-in-out infinite'}}>
+            <div className="claim-label">{t('loadingTitle')}</div>
+            <div style={{height: 24, width: '60%', borderRadius: 4, background: 'rgba(255,255,255,0.1)'}}></div>
+          </div>
+          <div className="loading-wrapper">
+            <div className="loading-spinner"></div>
+            <div className="loading-stage">{getLoadingStages()[stageIdx]}</div>
+            <div className="loading-timer">{t('elapsed')}{timeStr}</div>
+            <div className="loading-bar">
+              <div className="loading-bar-inner" style={{width: progress + '%'}}></div>
+            </div>
+          </div>
+          <SkeletonSpine />
+        </div>
+      );
+    }
+
+    function Shelf({ history, onLoad, onDelete, onClose }) {
+      return (
+        <div className="shelf-overlay">
+          <button className="shelf-backdrop" onClick={onClose}></button>
+          <div className="shelf-panel">
+            <div className="shelf-title">
+              <span>{t('shelf')}</span>
+              <button className="btn-ghost btn" onClick={onClose} style={{padding: '4px 12px'}}>{t('close')}</button>
+            </div>
+            {history.length === 0 ? (
+              <div className="shelf-empty">{t('shelfEmpty')}</div>
+            ) : history.map(record => (
+              <div key={record.id} className="shelf-item">
+                <div className="shelf-item-title">{record.title}</div>
+                <div className="shelf-item-claim">{record.core_claim}</div>
+                <div className="shelf-item-meta">
+                  <span>{record.argument_density}</span>
+                  <span>{new Date(record.analyzed_at).toLocaleDateString()}</span>
+                </div>
+                <div className="shelf-item-actions">
+                  <button className="shelf-btn-load" onClick={() => onLoad(record)}>{t('load')}</button>
+                  <button className="shelf-btn-delete" onClick={() => onDelete(record.id)}>{t('del')}</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [input, setInput] = useState('');
+      const [status, setStatus] = useState('idle');
+      const [error, setError] = useState('');
+      const [analysis, setAnalysis] = useState(null);
+      const [openCards, setOpenCards] = useState(new Set());
+      const [expandedPhases, setExpandedPhases] = useState(new Set());
+      const [showShelf, setShowShelf] = useState(false);
+      const [history, setHistory] = useState(() => loadHistory());
+      const [lang, setLang] = useState(currentLang);
+      const [fetchStatus, setFetchStatus] = useState('idle'); // idle | fetching
+      const abortRef = useRef(null);
+
+      const switchLang = (newLang) => {
+        window.location.href = newLang === 'zh' ? '/index-zh-v2.html' : '/index-en-v2.html';
+      };
+
+      const handleCancel = () => {
+        if (abortRef.current) { abortRef.current.abort(); abortRef.current = null; }
+        setStatus('idle');
+        setFetchStatus('idle');
+        setError('');
+      };
+
+      const handleFetchUrl = async () => {
+        const url = input.trim();
+        if (!isUrl(url)) return;
+        setError('');
+        setFetchStatus('fetching');
+        try {
+          const res = await fetch('/api/fetch-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || t('fetchFailed'));
+          }
+          const data = await res.json();
+          setInput(data.text);
+          setFetchStatus('idle');
+        } catch (err) {
+          setError(err.message || t('fetchFailed'));
+          setFetchStatus('idle');
+        }
+      };
+
+      const handleAnalyze = async () => {
+        const text = input.trim();
+        if (!text) { setError(t('errEmpty')); return; }
+        if (text.length < 100) { setError(t('errShort')); return; }
+        if (text.length > 50000) { setError(t('errLong')); return; }
+        setError('');
+        setStatus('loading');
+        setAnalysis(null);
+        const controller = new AbortController();
+        abortRef.current = controller;
+        try {
+          const res = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text }),
+            signal: controller.signal,
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || (t('errServer') + ' ' + res.status));
+          }
+          const result = await res.json();
+          abortRef.current = null;
+          // Convert spine format to phases format if needed
+          if (result.spine && !result.phases) {
+            // Group spine nodes into phases by level-1 nodes
+            const spineNodes = result.spine || [];
+            const gaps = result.logic_gaps || [];
+            const phases = [];
+            let currentPhase = null;
+
+            spineNodes.forEach((s, i) => {
+              const node = {
+                id: s.id ? String(s.id) : ('p-' + i),
+                level: s.level || 1,
+                type: s.type || 'reasoning',
+                title: s.title || '',
+                one_liner: s.summary || '',
+                summary: s.detail || s.summary || '',
+                evidence: s.detail || '',
+                transition: s.connection_to_next || null,
+              };
+
+              if (node.level === 1) {
+                // Start a new phase for each level-1 node
+                currentPhase = {
+                  id: phases.length + 1,
+                  title: node.title,
+                  subtitle: s.summary || '',
+                  nodes: [node],
+                  connectors: [],
+                  gaps: [],
+                };
+                phases.push(currentPhase);
+              } else if (currentPhase) {
+                // level-2 nodes go into the current phase
+                currentPhase.nodes.push(node);
+              } else {
+                // Edge case: level-2 before any level-1, create a default phase
+                currentPhase = {
+                  id: 1,
+                  title: node.title,
+                  subtitle: '',
+                  nodes: [node],
+                  connectors: [],
+                  gaps: [],
+                };
+                phases.push(currentPhase);
+              }
+            });
+
+            // Distribute logic_gaps into the correct phase
+            gaps.forEach(g => {
+              const afterId = String(g.after_step_id || '');
+              const gapObj = {
+                after_node: afterId,
+                title: g.description ? g.description.slice(0, 30) : t('logicGapFb'),
+                detail: g.description || '',
+                severity: 'medium',
+              };
+              // Find which phase contains the node with this id
+              let placed = false;
+              for (const phase of phases) {
+                if (phase.nodes.some(n => n.id === afterId)) {
+                  phase.gaps.push(gapObj);
+                  placed = true;
+                  break;
+                }
+              }
+              // If not matched, put in last phase
+              if (!placed && phases.length > 0) {
+                phases[phases.length - 1].gaps.push(gapObj);
+              }
+            });
+
+            result.phases = phases.length > 0 ? phases : [{
+              id: 1, title: t('argMainLine'), subtitle: result.core_claim || '',
+              nodes: spineNodes.map((s, i) => ({
+                id: s.id ? String(s.id) : ('p-' + i),
+                level: s.level || 1, type: s.type || 'reasoning',
+                title: s.title || '', one_liner: s.summary || '',
+                summary: s.detail || s.summary || '', evidence: s.detail || '',
+                transition: s.connection_to_next || null,
+              })),
+              connectors: [], gaps: [],
+            }];
+            // Convert verdict string to object if needed
+            if (typeof result.verdict === 'string') {
+              const v = result.verdict;
+              const m1 = v.match(/\(1\)[^(]*/);
+              const m2 = v.match(/\(2\)[^(]*/);
+              const m3 = v.match(/\(3\).*/);
+              result.verdict = {
+                strongest: m1 ? m1[0].replace(/^\(1\)\s*/, '').replace(/\u6700\u626E\u5B9E[锛?]\s*/,'').trim() : v,
+                weakest: m2 ? m2[0].replace(/^\(2\)\s*/, '').replace(/\u6700\u8584\u5F31[锛?]\s*/,'').trim() : '',
+                reading_advice: m3 ? m3[0].replace(/^\(3\)\s*/, '').replace(/\u9605\u8BFB\u5EFA\u8BAE[锛?]\s*/,'').trim() : '',
+              };
+            }
+          }
+          setAnalysis(result);
+          setStatus('success');
+          const firstPhase = result.phases?.[0];
+          if (firstPhase) {
+            setExpandedPhases(new Set([firstPhase.id]));
+            if (firstPhase.nodes?.[0]) {
+              setOpenCards(new Set([firstPhase.nodes[0].id]));
+            }
+          }
+          const record = {
+            id: '' + Date.now(),
+            title: inferTitle(text),
+            core_claim: result.core_claim,
+            analyzed_at: new Date().toISOString(),
+            argument_density: result.argument_density,
+            claim_clarity: result.claim_clarity,
+            logic_completeness: result.logic_completeness || '',
+            verdict: result.verdict,
+            phases: result.phases || [],
+          };
+          const next = [record, ...history].slice(0, 50);
+          setHistory(next);
+          saveHistory(next);
+        } catch (err) {
+          abortRef.current = null;
+          if (err.name === 'AbortError') { return; }
+          setError(err.message || t('errFailed'));
+          setStatus('error');
+        }
+      };
+
+      const loadExample = () => {
+        setInput(getExampleArticle());
+      };
+
+      const toggleCard = useCallback((id) => {
+        setOpenCards(prev => {
+          const next = new Set(prev);
+          next.has(id) ? next.delete(id) : next.add(id);
+          return next;
+        });
+      }, []);
+
+      const togglePhase = useCallback((id) => {
+        setExpandedPhases(prev => {
+          const next = new Set(prev);
+          next.has(id) ? next.delete(id) : next.add(id);
+          return next;
+        });
+      }, []);
+
+      const loadFromHistory = (record) => {
+        if (record.phases) {
+          setAnalysis({
+            core_claim: record.core_claim,
+            argument_density: record.argument_density,
+            claim_clarity: record.claim_clarity || t('medium'),
+            logic_completeness: record.logic_completeness || '',
+            verdict: record.verdict,
+            phases: record.phases,
+          });
+          const firstPhase = record.phases[0];
+          if (firstPhase) {
+            setExpandedPhases(new Set([firstPhase.id]));
+            if (firstPhase.nodes?.[0]) setOpenCards(new Set([firstPhase.nodes[0].id]));
+          }
+        } else if (record.spine) {
+          // Group spine nodes into phases by level-1 nodes
+          const spineNodes = record.spine || [];
+          const gaps = record.logic_gaps || [];
+          const phases = [];
+          let currentPhase = null;
+
+          spineNodes.forEach((s, i) => {
+            const node = {
+              ...s,
+              id: String(s.id || ('p-' + i)),
+              level: s.level || 1,
+              one_liner: s.summary?.slice(0, 25) || '',
+              evidence: s.detail || '',
+              transition: s.connection_to_next || null,
+            };
+
+            if (node.level === 1) {
+              currentPhase = {
+                id: phases.length + 1,
+                title: node.title || '',
+                subtitle: s.summary || '',
+                nodes: [node],
+                connectors: [],
+                gaps: [],
+              };
+              phases.push(currentPhase);
+            } else if (currentPhase) {
+              currentPhase.nodes.push(node);
+            } else {
+              currentPhase = {
+                id: 1, title: node.title || '', subtitle: '',
+                nodes: [node], connectors: [], gaps: [],
+              };
+              phases.push(currentPhase);
+            }
+          });
+
+          gaps.forEach(g => {
+            const afterId = String(g.after_step_id || '');
+            const gapObj = {
+              after_node: afterId,
+              title: t('logicGapFb'),
+              detail: g.description || '',
+              severity: 'medium',
+            };
+            let placed = false;
+            for (const phase of phases) {
+              if (phase.nodes.some(n => n.id === afterId)) {
+                phase.gaps.push(gapObj);
+                placed = true;
+                break;
+              }
+            }
+            if (!placed && phases.length > 0) {
+              phases[phases.length - 1].gaps.push(gapObj);
+            }
+          });
+
+          const finalPhases = phases.length > 0 ? phases : [{
+            id: 1, title: t('argMainLine'), subtitle: '',
+            nodes: spineNodes.map((s, i) => ({
+              ...s, id: String(s.id || ('p-' + i)),
+              one_liner: s.summary?.slice(0, 25) || '',
+              evidence: s.detail || '', transition: s.connection_to_next || null,
+            })),
+            connectors: [], gaps: [],
+          }];
+
+          setAnalysis({
+            core_claim: record.core_claim,
+            argument_density: record.argument_density,
+            claim_clarity: record.claim_clarity || t('medium'),
+            verdict: record.verdict,
+            phases: finalPhases,
+          });
+          const firstPhase = finalPhases[0];
+          setExpandedPhases(new Set([firstPhase?.id || 1]));
+          setOpenCards(new Set([firstPhase?.nodes?.[0]?.id || 'p-0']));
+        }        setStatus('success');
+        setShowShelf(false);
+      };
+
+      const deleteFromHistory = (id) => {
+        const next = history.filter(h => h.id !== id);
+        setHistory(next);
+        saveHistory(next);
+      };
+
+      const renderResult = () => {
+        if (!analysis) return null;
+        const phases = analysis.phases || [];
+        return (
+          <div className="result-section result-enter">
+            <div className="claim-enter"><ClaimBanner analysis={analysis} /></div>
+            {phases.map((phase, i) => (
+              <div key={phase.id} className="phase-enter" style={{animationDelay: (0.1 + i * 0.08) + 's'}}>
+                <PhaseSection
+                  phase={phase}
+                  phaseIndex={i}
+                  openCards={openCards}
+                  onToggle={toggleCard}
+                  expandedPhases={expandedPhases}
+                  onTogglePhase={togglePhase}
+                />
+              </div>
+            ))}
+            {analysis.verdict && <div className="verdict-enter" style={{animationDelay: (0.1 + phases.length * 0.08) + 's'}}><Verdict verdict={analysis.verdict} /></div>}
+          </div>
+        );
+      };
+
+      return (
+        <div>
+          <div className="container">
+            <header className="header">
+              <div className="header-row">
+                <div>
+                  <div className="header-brand">Lumen</div>
+                  <h1 className="header-title">{t('headerTitle')}</h1>
+                  <p className="header-sub">{t('headerSub')}</p>
+                </div>
+                <div className="header-actions">
+                  <button className="btn btn-ghost" onClick={() => setShowShelf(true)}>{t('shelfBtn')} ({history.length})</button>
+                  <div className="lang-toggle">
+                    <button className={'lang-btn' + (lang === 'zh' ? ' active' : '')} onClick={() => switchLang('zh')}>{'CN'}</button>
+                    <button className={'lang-btn' + (lang === 'en' ? ' active' : '')} onClick={() => switchLang('en')}>{'EN'}</button>
+                  </div>
+                </div>
+              </div>
+            </header>
+          </div>
+          <div className="container">
+            <section className="input-section">
+              <textarea className="textarea" value={input} onChange={e => { setInput(e.target.value); if (error) setError(''); }} placeholder={t('placeholder')} disabled={status === 'loading' || fetchStatus === 'fetching'} style={(status === 'loading' || fetchStatus === 'fetching') ? {opacity: 0.5} : {}} />
+              {isUrl(input.trim()) && status !== 'loading' && (
+                <div className="url-hint">
+                  <span className="url-hint-icon">{'\uD83D\uDD17'}</span>
+                  <span>{t('urlDetected')}</span>
+                </div>
+              )}
+              <div className="input-footer">
+                <div style={{display:'flex', gap:'12px', alignItems:'center'}}>
+                  {input.trim().length > 0 && !isUrl(input.trim()) && <span className="input-hint">{input.trim().length + ' ' + t('charUnit')}</span>}
+                  {status === 'loading' && <span className="input-hint">{t('usuallyTakes')}</span>}
+                </div>
+                <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                  {status === 'loading' && <button className="btn-cancel" onClick={handleCancel}>{t('cancel')}</button>}
+                  {isUrl(input.trim()) && status !== 'loading' && (
+                    <button className="btn-fetch" onClick={handleFetchUrl} disabled={fetchStatus === 'fetching'}>
+                      {fetchStatus === 'fetching' ? t('fetching') : t('fetchBtn')}
+                    </button>
+                  )}
+                  {!isUrl(input.trim()) && (
+                    <button className="btn btn-primary" onClick={handleAnalyze} disabled={status === 'loading'}>
+                      {status === 'loading' ? t('analyzing') : t('analyze')}
+                    </button>
+                  )}
+                </div>
+              </div>
+              {status === 'idle' && !input.trim() && (
+                <button className="example-hint" onClick={loadExample}>
+                  <span>{t('tryExample')}</span>
+                </button>
+              )}
+              {status === 'idle' && !input.trim() && (
+                <div className="compat-section">
+                  <div className="compat-row">
+                    <div className="compat-col">
+                      <div className={'compat-label compat-label-ok'}>{currentLang === 'zh' ? '\u652F\u6301\u4EE5\u4E0B\u7F51\u7AD9\u94FE\u63A5\u76F4\u63A5\u63D0\u53D6' : 'Direct URL extraction supported'}</div>
+                      <ul className="compat-list">
+                        <li>{currentLang === 'zh' ? '\u5FAE\u4FE1\u516C\u4F17\u53F7\u6587\u7AE0' : 'WeChat Official Accounts'}</li>
+                        <li>{'LinkedIn '}{currentLang === 'zh' ? '\u6587\u7AE0\u4E0E\u4E13\u680F' : 'articles & newsletters'}</li>
+                        <li>{'Substack / Medium'}</li>
+                        <li>{currentLang === 'zh' ? '\u4E2A\u4EBA\u535A\u5BA2\u4E0E\u9759\u6001\u7F51\u9875' : 'Personal blogs & static pages'}</li>
+                        <li>{currentLang === 'zh' ? '\u5176\u4ED6\u7EDD\u5927\u591A\u6570\u7F51\u7AD9' : 'Most other websites'}</li>
+                      </ul>
+                    </div>
+                    <div className="compat-col">
+                      <div className={'compat-label compat-label-no'}>{currentLang === 'zh' ? '\u6682\u4E0D\u652F\u6301\uFF08\u9700\u624B\u52A8\u7C98\u8D34\u6587\u7AE0\uFF09' : 'Not yet supported (paste text manually)'}</div>
+                      <ul className="compat-list">
+                        <li>{'X.com (Twitter)'}</li>
+                        <li>{currentLang === 'zh' ? '\u77E5\u4E4E\u4E13\u680F' : 'Zhihu columns'}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+          </div>
+          <div className="container">
+            {error && <div className="error-box">{error}</div>}
+            {status === 'loading' && <LoadingState />}
+            {status === 'success' && renderResult()}
+          </div>
+          <div className="container">
+            <div className="disclaimer">
+              <div className="disclaimer-title">{t('disclaimerTitle')}</div>
+              <div>{t('disclaimerText')}</div>
+            </div>
+          </div>
+          <footer style={{textAlign:'center', padding:'24px 0', fontSize:'11px', color:'var(--ink-muted)', borderTop:'1px solid var(--border-light)', marginTop:'24px'}}>
+            <a href="/privacy.html" style={{color:'var(--ink-muted)', textDecoration:'none'}}>{t('privacy')}</a>
+            <span style={{margin:'0 8px'}}>{'\u00B7'}</span>
+            <a href="/terms.html" style={{color:'var(--ink-muted)', textDecoration:'none'}}>{t('terms')}</a>
+          </footer>
+          {showShelf && <Shelf history={history} onLoad={loadFromHistory} onDelete={deleteFromHistory} onClose={() => setShowShelf(false)} />}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
